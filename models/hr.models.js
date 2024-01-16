@@ -25,7 +25,7 @@ HRchema.methods.generateAuthToken = function () {
     {_id: this._id, name: this.hr_name, row: "hr"},
     process.env.JWTPRIVATEKEY,
     {
-      expiresIn: "4h",
+      expiresIn: "8h",
     }
   );
   return token;
