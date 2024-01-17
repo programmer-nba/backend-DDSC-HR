@@ -4,6 +4,7 @@ const Joi = require("joi");
 const passwordComplexity = require("joi-password-complexity");
 
 const CandidateSchema = new mongoose.Schema({
+    image: {type: String, required: false},
     Candidate_id: {type: String, required: false},//รหัสสมาชิก
     Candidate_username:{type: String, required: false},//ไอดีสมาชิก
     Candidate_password:{type: String, required: false},//รหัสสมาชิก

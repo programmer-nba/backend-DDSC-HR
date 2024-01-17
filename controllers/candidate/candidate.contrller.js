@@ -3,6 +3,7 @@ const dayjs = require("dayjs");
 const {google} = require("googleapis");
 const req = require("express/lib/request.js");
 const {candidate,validateCadidate} = require("../../models/candidate/candidate.model")
+const multer = require("multer");
 const CLIENT_ID = process.env.GOOGLE_DRIVE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_DRIVE_CLIENT_SECRET;
 const REDIRECT_URI = process.env.GOOGLE_DRIVE_REDIRECT_URI;
@@ -45,59 +46,63 @@ async function generatePublicUrl(res) {
   }
 }
 //update image
-async function uploadFileCreate(req, res, {i, reqFiles}) {
-  if (!req[i]) {
-    console.error("Invalid value for 'i'");
-    return res.status(400).send({ message: "Invalid value for 'i'" });
-  }
-  const filePath = req[i].path;
-  let fileMetaData = {
-    name: req.originalname,
-    parents: [process.env.GOOGLE_DRIVE_IMAGE_PRODUCT],
-  };
-  let media = {
-    body: fs.createReadStream(filePath),
-  };
-  try {
-    const response = await drive.files.create({
-      resource: fileMetaData,
-      media: media,
-    });
+const {
+  uploadFileCreate,
+  deleteFile,
+} = require("../../funtions/uploadfilecreate");
 
-    generatePublicUrl(response.data.id);
-    reqFiles.push(response.data.id);
-  } catch (error) {
-    res.status(500).send({message: "Internal Server Error"});
-  }
-}
 
 
 exports.create = async (req, res) => {
-    try {
-      const {error} = validateCadidate(req.body);
-      if (error) {
-        return res
-          .status(400)
-          .send({status: false, message: error.details[0].message});
+  try {
+    let upload = multer({ storage: storage }).array("imgCollection", 20);
+    upload(req, res, async function (err) {
+      const reqFiles = [];
+      const result = [];
+      if (err) {
+        return res.status(500).send(err);
       }
-      const user = await candidate.findOne({
+      let image = '' // ตั้งตัวแปรรูป
+      if (req.files) {
+        const url = req.protocol + "://" + req.get("host");
+        for (var i = 0; i < req.files.length; i++) {
+          const src = await uploadFileCreate(req.files, res, { i, reqFiles });
+          result.push(src);
+          //   reqFiles.push(url + "/public/" + req.files[i].filename);
+        }
+        image = reqFiles[0]
+      }
+      const user = await candidate.findOne({Candidate_username:req.body.Candidate_username})
+      if(user)
+      { 
+        return res.status(409).send({ status: false, message: "username นี้มีคนใช้แล้ว" });
+      } 
+      const salt = await bcrypt.genSalt(Number(process.env.SALT));
+      const hashPassword = await bcrypt.hash(req.body.Candidate_password, salt);
+      const member=  new candidate({
+        Candidate_prefix:req.body.Candidate_prefix,
         Candidate_username: req.body.Candidate_username,
+        Candidate_lastname:req.body.Candidate_lastname,
+        Candidate_name:req.body.Candidate_name,
+        Candidate_idcard:req.body.Candidate_idcard,
+        Candidate_birthday:req.body.Candidate_birthday,
+        Candidate_email:req.body.Candidate_email,
+        Candidate_idcard:req.body.Candidate_idcard,
+        Candidate_password:hashPassword,
+        Candidate_position: req.body.Candidate_position,
+        Candidate_phone:req.body.Candidate_phone,
+        image: image,
       });
-      if (user) {
-        return res.status(400).send({
-          status: false,
-          message: "มีชื่อผู้ใช้งานนี้ในระบบเเล้ว",
+      const add = await member.save();
+      return res
+        .status(200)
+        .send({
+          status: true,
+          message: "คุณได้สร้างไอดี user เรียบร้อย",
+          data:add
         });
-      } else {
-        const salt = await bcrypt.genSalt(Number(process.env.SALT));
-        const hashPassword = await bcrypt.hash(req.body.Candidate_password, salt);
-        await new Hr({
-          ...req.body,
-          Candidate_password: hashPassword,
-        }).save();
-        return res.status(200).send({message: "สร้างข้อมูลสำเร็จ", status: true});
-      }
-    } catch (err) {
-      return res.status(500).send({status: false, message: "มีบางอย่างผิดพลาด"});
-    }
-  };
+    });
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message });
+  }
+};

@@ -11,6 +11,7 @@ app.use(cors());
 
 app.use("/HR", require("./router"));
 app.use("/HR/admin", require("./router/hr/index"));
+app.use("/Candidate", require("./router/candidate/index"))
 
 
 
