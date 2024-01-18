@@ -106,3 +106,96 @@ exports.create = async (req, res) => {
     return res.status(500).send({ status: false, error: error.message });
   }
 };
+exports.EditCandidate = async (req,res) =>{
+  console.log(req.body)
+  try {
+    if (!req.body) {
+      return res.status(400).send({
+        message: "ส่งข้อมูลผิดพลาด",
+      });
+    }
+    const id = req.params.id;
+    if (!req.body.Candidate_password) {
+      const candidates = await candidate.findByIdAndUpdate(id, req.body);
+      if (candidates) {
+        if (candidates) {
+          return res
+            .status(200)
+            .send({message: "แก้ไขผู้ใช้งานนี้เรียบร้อยเเล้ว", status: true});
+        } else {
+          return res
+            .status(500)
+            .send({message: "ไม่สามารถเเก้ไขผู้ใช้งานนี้ได้", status: false});
+        }
+      }
+    } else {
+      const salt = await bcrypt.genSalt(Number(process.env.SALT));
+      const hashPassword = await bcrypt.hash(req.body.Candidate_password, salt);
+      const candidates = await candidate.findByIdAndUpdate(id, {
+        ...req.body,
+        Candidate_password: hashPassword,
+      });
+      if (candidates) {
+        return res
+          .status(200)
+          .send({message: "แก้ไขผู้ใช้งานนี้เรียบร้อยเเล้ว", status: true});
+      } else {
+        return res
+          .status(500)
+          .send({message: "ไม่สามารถเเก้ไขผู้ใช้งานนี้ได้", status: false});
+      }
+    }
+  } catch (error) {
+    res.status(500).send({message: "มีบางอย่างผิดพลาด", status: false});
+  }
+}
+exports.deleteCandidate = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const manager = await candidate.findByIdAndDelete(id);
+    if (!manager) {
+      return res
+        .status(404)
+        .send({status: false, message: "ไม่พบข้อมูลผู้สมัครสมาชิก"});
+    } else {
+      return res
+        .status(200)
+        .send({status: true, message: "ลบข้อมูลผู้สมัครสำเร็จ"});
+    }
+  } catch (err) {
+    return res.status(500).send({status: false, message: "มีบางอย่างผิดพลาด"});
+  }
+};
+exports.GetCadidateAll = async(req,res) =>{
+  try {
+    const candidates = await candidate.find();
+    if (candidates) {
+      return res.status(200).send({
+        status: true,
+        message: "ดึงข้อมูลสมาชิกสำเร็จ",
+        data: candidates,
+      });
+    } else {
+      return res.status(404).send({message: "ดึงข้อมูลสมาชิกไม่สำเร็จ", status: false});
+    }
+  } catch (err) {
+    res.status(500).send({message: "มีบางอย่างผิดพลาด", status: false});
+  }
+}
+exports.GetCadidateById = async(req,res) =>{
+  try {
+    const id = req.params.id
+    const candidated = await candidate.findOne({Candidate_idcard:id});
+    if (candidated) {
+      return res.status(200).send({
+        status: true,
+        message: "ดึงข้อมูลสมาชิกสำเร็จ",
+        data: candidated,
+      });
+    } else {
+      return res.status(404).send({message: "ดึงข้อมูลสมาชิกไม่สำเร็จ", status: false});
+    }
+  } catch (err) {
+    res.status(500).send({message: "มีบางอย่างผิดพลาด", status: false});
+  }
+}
