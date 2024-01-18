@@ -45,46 +45,46 @@ router.post("/login", async (req, res) => {
   });
 
   const checkCandidate = async (req, res) => {
-    // try {
-    //   const manager = await Manager.findOne({
-    //     manager_username: req.body.username,
-    //   });
-    //   if (!manager) return await checkEmployee(req, res);
-    //   // if (!manager) {
-    //   //   // await checkEmployee(req, res);
-    //   //   console.log("123456");
-    //   // }
-    //   const validPasswordAdmin = await bcrypt.compare(
-    //     req.body.password,
-    //     manager.manager_password
-    //   );
-    //   if (!validPasswordAdmin) {
-    //     // รหัสไม่ตรง
-    //     return res.status(401).send({
-    //       message: "password is not find",
-    //       status: false,
-    //     });
-    //   } else {
-    //     const token = manager.generateAuthToken();
-    //     const ResponesData = {
-    //       name: manager.manager_username,
-    //       username: manager.manager_password,
-    //       // shop_id: cashier.cashier_shop_id,
-    //     };
-    //     return res.status(200).send({
-    //       status: true,
-    //       token: token,
-    //       message: "เข้าสู่ระบบสำเร็จ",
-    //       result: ResponesData,
-    //       level: "manager",
-    //       position: manager.manager_role,
-    //     });
-    //   }
-    // } catch (error) {
-    //   return res
-    //     .status(500)
-    //     .send({message: "Internal Server Error", status: false});
-    // }
+    try {
+      const hr = await Hr.findOne({
+        Hr_username: req.body.username,
+      });
+      // if (!manager) return await checkEmployee(req, res);
+      // if (!manager) {
+      //   // await checkEmployee(req, res);
+      //   console.log("123456");
+      // }
+      const validPasswordAdmin = await bcrypt.compare(
+        req.body.password,
+        manager.hr_password
+      );
+      if (!validPasswordAdmin) {
+        // รหัสไม่ตรง
+        return res.status(401).send({
+          message: "password is not find",
+          status: false,
+        });
+      } else {
+        const token = manager.generateAuthToken();
+        const ResponesData = {
+          name: hr.Hr_username,
+          username: hr.hr_password,
+          // shop_id: cashier.cashier_shop_id,
+        };
+        return res.status(200).send({
+          status: true,
+          token: token,
+          message: "เข้าสู่ระบบสำเร็จ",
+          result: ResponesData,
+          level: "manager",
+          position: hr.hr_role,
+        });
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .send({message: "Internal Server Error", status: false});
+    }
   };
 
 router.get("/me", authHR, async (req, res) => {
@@ -107,18 +107,18 @@ router.get("/me", authHR, async (req, res) => {
         }
       } if (decoded && decoded.row === "candidate") {
         const id = decoded._id;
-        const manager = await Manager.findOne({_id: id});
-        if (!manager) {
+        const hr = await Hr.findOne({_id: id});
+        if (!hr) {
           return res
             .status(400)
             .send({message: "มีบางอย่างผิดพลาด", status: false});
         } else {
           return res.status(200).send({
-            shop_id: manager.manager_shop_id,
-            name: manager.manager_name,
-            username: manager.manager_username,
-            position: manager.manager_position,
-            level: manager.manager_role,
+            // shop_id: hr.manager_shop_id,
+            name: hr.hr_name,
+            username: hr.Hr_username,
+            position: hr.hr_position,
+            level: hr.hr_role,
           });
         }
         manager;
