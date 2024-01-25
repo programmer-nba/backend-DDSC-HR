@@ -72,6 +72,7 @@ exports.create = async (req, res) => {
           //   reqFiles.push(url + "/public/" + req.files[i].filename);
         }
         image = reqFiles[0];
+        console.log(image)
       }
       const user = await candidate.findOne({
         Candidate_username: req.body.Candidate_username,
