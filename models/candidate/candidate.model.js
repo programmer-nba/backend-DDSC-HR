@@ -5,6 +5,7 @@ const passwordComplexity = require("joi-password-complexity");
 
 const CandidateSchema = new mongoose.Schema({
     image: {type: String, required: false},
+    Candidate_Resume_img: {type: String, required: false , default:"เพิ่มรูปภาพ"},//รูปภาพเรซูเม
     Candidate_id: {type: String, required: false},//รหัสสมาชิก
     Candidate_username:{type: String, required: false},//ไอดีสมาชิก
     Candidate_password:{type: String, required: false},//รหัสสมาชิก
@@ -18,7 +19,6 @@ const CandidateSchema = new mongoose.Schema({
     Candidate_position: {type: String, required: true},
     Candidate_note: {type: String, default:"ไม่มี"},//หมายเหตุ
     Candidate_createdby:{type: String, required: false},//สร้างโดย
-    
     Candidate_type:{type: String, required: false , default :"ไม่มี"} 
 
   });

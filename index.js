@@ -8,12 +8,11 @@ connection();
 app.use(express.json());
 app.use(cors());
 
+const prefix = "/JobInterview";
 
-app.use("/HR", require("./router"));
-app.use("/HR/admin", require("./router/hr/index"));
-app.use("/Candidate", require("./router/candidate/index"))
-
-
+app.use(prefix + "/HR", require("./router"));
+app.use(prefix + "/admin", require("./router/hr/index"));
+app.use(prefix + "/Candidate", require("./router/candidate/index"));
 
 const port = process.env.PORT || 4894;
 app.listen(port, console.log(`Listening on port ${port}`));
