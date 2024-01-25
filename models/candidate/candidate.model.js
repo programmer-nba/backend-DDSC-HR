@@ -18,6 +18,7 @@ const CandidateSchema = new mongoose.Schema({
     Candidate_position: {type: String, required: true},
     Candidate_note: {type: String, default:"ไม่มี"},//หมายเหตุ
     Candidate_createdby:{type: String, required: false},//สร้างโดย
+    
     Candidate_type:{type: String, required: false , default :"ไม่มี"} 
 
   });
