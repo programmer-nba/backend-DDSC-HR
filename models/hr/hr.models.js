@@ -16,7 +16,7 @@ const complexityOptions = {
 const HRchema = new mongoose.Schema({
   image: { type: String, required: false },
   hr_name: { type: String, required: true }, //ชื่อ
-  hr_lastname: { type: String, required: true }, 
+  hr_lastname: { type: String, required: true },
   Hr_username: { type: String, required: true }, //เลขบัตร
   hr_password: { type: String, required: true }, //รหัส
   hr_position: { type: String, required: true },
@@ -47,9 +47,9 @@ const validateHr = (data) => {
       .required()
       .label("hr_password"),
     hr_position: Joi.string().required().label("กรุณากรอกเลเวลผู้ใช้ด้วย"),
-    hr_birthday:Joi.string().required().label("กรุณากรอกวันเดือนปีเกิดด้วย"),
-    hr_email:Joi.string().required().label("กรุณากรอกอีเมล์ด้วย"),
-    hr_phone:Joi.string().required().label("กรุณากรอกเบอร์โทรด้วย"),
+    hr_birthday: Joi.string().required().label("กรุณากรอกวันเดือนปีเกิดด้วย"),
+    hr_email: Joi.string().required().label("กรุณากรอกอีเมล์ด้วย"),
+    hr_phone: Joi.string().required().label("กรุณากรอกเบอร์โทรด้วย"),
   });
   return schema.validate(data);
 };
