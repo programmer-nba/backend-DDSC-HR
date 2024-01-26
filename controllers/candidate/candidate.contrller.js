@@ -72,7 +72,7 @@ exports.create = async (req, res) => {
           //   reqFiles.push(url + "/public/" + req.files[i].filename);
         }
         image = reqFiles[0];
-        console.log(image)
+        console.log(image);
       }
       const user = await candidate.findOne({
         Candidate_username: req.body.Candidate_username,
@@ -97,6 +97,10 @@ exports.create = async (req, res) => {
         Candidate_position: req.body.Candidate_position,
         Candidate_phone: req.body.Candidate_phone,
         image: image,
+        Candidate_nationality: req.body.Candidate_nationality,
+        Candidate_Education_History: req.body.Candidate_Education_History,
+        Candidate_Work_Experiences: req.body.Candidate_Work_Experiences,
+        Candidate_position_need: req.body.Candidate_position_need,
       });
       const add = await member.save();
       return res.status(200).send({
@@ -210,6 +214,24 @@ exports.deleteCandidate = async (req, res) => {
       .send({ status: false, message: "มีบางอย่างผิดพลาด" });
   }
 };
+exports.deleteCandidateAll = async (req, res) => {
+  try {
+    const member = await candidate.deleteMany();
+    if (!member) {
+      return res
+        .status(404)
+        .send({ status: false, message: "ไม่พบข้อมูลผู้สมัครสมาชิก" });
+    } else {
+      return res
+        .status(200)
+        .send({ status: true, message: "ลบข้อมูลผู้สมัครสำเร็จ" });
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .send({ status: false, message: "มีบางอย่างผิดพลาด" });
+  }
+};
 exports.GetCadidateAll = async (req, res) => {
   try {
     const candidates = await candidate.find();
@@ -228,10 +250,29 @@ exports.GetCadidateAll = async (req, res) => {
     res.status(500).send({ message: "มีบางอย่างผิดพลาด", status: false });
   }
 };
-exports.GetCadidateById = async (req, res) => {
+exports.GetCadidateByIdCard = async (req, res) => {
   try {
     const id = req.params.id;
     const candidated = await candidate.findOne({ Candidate_idcard: id });
+    if (candidated) {
+      return res.status(200).send({
+        status: true,
+        message: "ดึงข้อมูลสมาชิกสำเร็จ",
+        data: candidated,
+      });
+    } else {
+      return res
+        .status(404)
+        .send({ message: "ดึงข้อมูลสมาชิกไม่สำเร็จ", status: false });
+    }
+  } catch (err) {
+    res.status(500).send({ message: "มีบางอย่างผิดพลาด", status: false });
+  }
+};
+exports.GetCadidateById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const candidated = await candidate.findById(id);
     if (candidated) {
       return res.status(200).send({
         status: true,
