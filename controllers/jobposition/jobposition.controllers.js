@@ -14,6 +14,7 @@ const {
   deleteFile,
 } = require("../../funtions/uploadfilecreate");
 const { admin } = require("googleapis/build/src/apis/admin");
+const req = require("express/lib/request");
 
 exports.create = async (req, res) => {
   try {
@@ -50,6 +51,38 @@ exports.create = async (req, res) => {
         status: true,
         message: "คุณได้สร้างตำเเหน่งงานเรียบร้อย",
         data: add,
+      });
+    });
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message });
+  }
+};
+exports.EditJob = async (req, res) => {
+  try {
+    let upload = multer({ storage: storage }).array("imgCollection", 20);
+    upload(req, res, async function (err) {
+      // ตรวจสอบข้อผิดพลาดจากการอัปโหลด
+      if (err) {
+        return res.status(500).send(err);
+      }
+      const reqFiles = [];
+      const result = [];
+      if (req.files) {
+        const url = req.protocol + "://" + req.get("host");
+        for (var i = 0; i < req.files.length; i++) {
+          const src = await uploadFileCreate(req.files, res, { i, reqFiles });
+          result.push(src);
+        }
+      }
+      const id = req.params.id;
+      const job = await Jobposition.findByIdAndUpdate(id, {
+        ...req.body,
+        profile_image: reqFiles[0], // หรือใส่ค่าที่คุณต้องการ
+      });
+
+      return res.status(200).send({
+        message: "แก้ไขผู้ใช้งานนี้เรียบร้อยแล้ว",
+        status: true,
       });
     });
   } catch (error) {
